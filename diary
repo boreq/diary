@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# Display help and abort if requested
+if [ "$1" == "--help" ]
+then
+    echo "A script for writing a diary."
+    echo ""
+    echo "By default the entries are stored in \$HOME/.diary/. Export \$DIARY to"
+    echo "change that directory."
+    echo ""
+    echo "Syntax:"
+    echo "diary"
+    echo "diary read [year [month [day]]]"
+    echo "diary write [year month day]"
+    exit 0
+fi
+
+
+# Pick the root directory for the diary
+if [ "$DIARY" != "" ]
+then
+    dir=$DIARY
+else
+    dir=$HOME/.diary
+fi
+
+
+# Pick the action: read or write
+action=$1
+if [ "$action" != "write" ] && [ "$action" != "read" ]
+then
+    action="write"
+fi
+
+
+# Read and sanitize year, month and day for which the action should be performed
+action_year=$2
+action_month=$3
+action_day=$4
+
+if [ ${#action_month} -eq 1 ]
+then
+    action_month="0$action_month"
+fi
+
+if [ ${#action_day} -eq 1 ]
+then
+    action_day="0$action_day"
+fi
+
+
+# Read the current year, month and day to use as defaults if needed
+year=$(date '+%Y')
+month=$(date '+%m')
+day=$(date '+%d')
+
+
+# Write the diary
+if [ "$action" == "write" ]
+then
+    # Write needs all parameters to be specified or uses a default value with no
+    # parameters given
+    if [ "$action_year" == "" ] && [ "$action_month" == "" ] && [ "$action_day" == "" ]
+    then
+        action_year=$year
+        action_month=$month
+        action_day=$day
+    else
+        if [ "$action_year" == "" ] || [ "$action_month" == "" ] || [ "$action_day" == "" ]
+        then
+            echo "Missing parameters, syntax: diary write [year month day]"
+            exit 1
+        fi
+    fi
+
+    diary_path="$dir/$action_year/$action_month"
+    diary_file="$diary_path/$action_day"
+    mkdir -p "$diary_path"
+    "${EDITOR:-vi}" "$diary_file"
+fi
+
+
+# Read the diary
+if [ "$action" == "read" ]
+then
+    # All parameters are optional for the read action
+    diary_path="$dir"
+
+    if [ "$action_year" != "" ]
+    then
+        diary_path="$diary_path/$action_year"
+    fi
+
+    if [ "$action_month" != "" ]
+    then
+        diary_path="$diary_path/$action_month"
+    fi
+
+    if [ "$action_day" != "" ]
+    then
+        diary_path="$diary_path/$action_day"
+    fi
+
+    if [ -d "$diary_path" ]
+    then
+        files="$(find $diary_path -type f | sort)"
+        tail -n +1 $files | less # works like cat but prepends a filename to each file
+    fi
+fi
