@@ -174,7 +174,7 @@ cmd_read() {
         output+="$contents"
         output+=$'\n'
         output+=$'\n'
-    done < <(find -L "$diary_dir" -type f -print0 | sort -z)
+    done < <(find -L "$diary_dir" -type f -print0 | sort -zr)
 
     echo "$output" | less
 }
