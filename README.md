@@ -2,8 +2,11 @@
 A script for writing a diary.
 
 ## Configuration
-By default the entries are stored in `$HOME/.diary/`. Export `$DIARY` to
-change that directory.
+By default the entries are stored in `$XDG_DATA_HOME/diary`.
+
+## Initializing a diary
+
+    diary init <gpg-id>
 
 ## Writing a diary
 To create or edit an entry for the current day:
