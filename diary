@@ -71,7 +71,6 @@ cmd_init() {
 cmd_write() {
     process_data_directory;
 
-    # Read and sanitize year, month and day for which the action should be performed
     action_year=$1
     action_month=$2
     action_day=$3
@@ -86,8 +85,6 @@ cmd_write() {
         action_day="0$action_day"
     fi
 
-    # Write needs all parameters to be specified or uses a default value with no
-    # parameters given
     if [ "$action_year" == "" ] && [ "$action_month" == "" ] && [ "$action_day" == "" ]
     then
         action_year=$current_year
